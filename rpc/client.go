@@ -126,6 +126,7 @@ func (c *Client) nextSeq() uint32 {
 }
 
 func (c *Client) replyError(req *Message) {
+	stats.RemovePendingOp(req.ID, false)
 	delete(c.messages, req.Seq)
 	req.Type = TypeError
 	req.Data = []byte(c.err.Error())
@@ -133,6 +134,12 @@ func (c *Client) replyError(req *Message) {
 }
 
 func (c *Client) handleRequest(req *Message) {
+	switch req.Type {
+	case TypeRead:
+		req.ID = stats.InsertPendingOp(time.Now(), c.wire.conn.RemoteAddr().String(), stats.OpRead, len(req.Data))
+	case TypeWrite:
+		req.ID = stats.InsertPendingOp(time.Now(), c.wire.conn.RemoteAddr().String(), stats.OpWrite, len(req.Data))
+	}
 	if c.err != nil {
 		c.replyError(req)
 		return
@@ -159,6 +166,7 @@ func (c *Client) handleResponse(resp *Message) {
 			return
 		}
 
+		stats.RemovePendingOp(req.ID, true)
 		delete(c.messages, resp.Seq)
 		// can probably optimize away this copy
 		if len(resp.Data) > 0 {
