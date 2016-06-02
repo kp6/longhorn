@@ -52,8 +52,8 @@ func (c *ControllerClient) Snapshot() (string, error) {
 	return output.Id, err
 }
 
-func (c *ControllerClient) ListStats() error {
-	err := c.post("/stats", nil, nil)
+func (c *ControllerClient) ListStats(limit int) error {
+	err := c.post("/stats", &rest.StatsInput{Limit: limit}, nil)
 	return err
 }
 

@@ -45,6 +45,11 @@ type SnapshotInput struct {
 	Name string `json:"name"`
 }
 
+type StatsInput struct {
+	client.Resource
+	Limit int `json:"limit"`
+}
+
 func NewVolume(context *api.ApiContext, name string, replicas int) *Volume {
 	v := &Volume{
 		Resource: client.Resource{
@@ -97,6 +102,7 @@ func NewSchema() *client.Schemas {
 	schemas.AddType("startInput", StartInput{})
 	schemas.AddType("snapshotOutput", SnapshotOutput{})
 	schemas.AddType("snapshotInput", SnapshotInput{})
+	schemas.AddType("statsInput", StatsInput{})
 
 	replica := schemas.AddType("replica", Replica{})
 	replica.CollectionMethods = []string{"GET", "POST"}
