@@ -52,6 +52,11 @@ func (c *ControllerClient) Snapshot() (string, error) {
 	return output.Id, err
 }
 
+func (c *ControllerClient) ListStats() error {
+	err := c.post("/stats", nil, nil)
+	return err
+}
+
 func (c *ControllerClient) ListReplicas() ([]rest.Replica, error) {
 	var resp rest.ReplicaCollection
 	err := c.get("/replicas", &resp)
